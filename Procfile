@@ -1,1 +1,1 @@
-web: nodejs facer.js
+web: node facer.js
