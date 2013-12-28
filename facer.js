@@ -1,7 +1,5 @@
 var express = require("express");
 var logfmt = require("logfmt");
-var facedetect = require("face-detect");
-var fs = require('fs');
 
 var ref = require('ref');
 var struct = require('ref-struct');
@@ -26,7 +24,7 @@ var libNBiometrics = ffi.Library('lib/libNBiometrics', {
 
 var pAvailable = ref.alloc('bool');
 var components = "Biometrics.FaceDetection,Biometrics.FaceExtraction";
-//var result = libNLicense.NLicenseObtainComponentsA("/local", "5000", components, pAvailable);
+var result = libNLicense.NLicenseObtainComponentsA("/local", "5000", components, pAvailable);
 var result = 0;
 
 //var components = "SingleComputerLicense:VLExtractor";
