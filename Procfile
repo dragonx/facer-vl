@@ -1,1 +1,1 @@
-web: node facer.js
+web: ./launch.sh
