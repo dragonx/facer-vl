@@ -1,6 +1,5 @@
 var express = require("express");
 var logfmt = require("logfmt");
-var canvas = require("canvas");
 var facedetect = require("face-detect");
 var fs = require('fs');
 
@@ -51,7 +50,6 @@ if(!pAvailable.deref())
 
 var app = express();
 
-var buffer = new canvas(640, 480), ctx = buffer.getContext('2d');
 
 app.use(logfmt.requestLogger());
 app.use(express.bodyParser());
@@ -61,9 +59,6 @@ app.get('/', function(req, res) {
 });
 
 app.get('/image', function(req, res) {
-    var stream = buffer.createPNGStream();
-    res.writeHead(200, {'Content-Type':'image/png'});
-    stream.pipe(res);
 });
 
 app.post('/', function(req, res) {
@@ -92,6 +87,10 @@ app.post('/', function(req, res) {
     var faces = ref.alloc('pointer');
     result = libNBiometrics.NleDetectFaces(pExtractor.deref(), pGrayscale.deref(), faceCount, faces);
     debugger;
+    if(result < 0)
+    {
+        res.status(500).send("Face detection failed with error " + result);
+    }
 
     res.send("Found " + faces.deref() + " faces.");
 });
