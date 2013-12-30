@@ -1,2 +1,2 @@
-activation/run_pgd.sh start
+#activation/run_pgd.sh start
 node facer.js

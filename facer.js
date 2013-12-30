@@ -24,12 +24,11 @@ var libNBiometrics = ffi.Library('lib/libNBiometrics', {
 
 var pAvailable = ref.alloc('bool');
 var components = "Biometrics.FaceDetection,Biometrics.FaceExtraction";
-var result = libNLicense.NLicenseObtainComponentsA("/local", "5000", components, pAvailable);
-var result = 0;
+var result = libNLicense.NLicenseObtainComponentsA("99.225.93.59", "5000", components, pAvailable);
 
-//var components = "SingleComputerLicense:VLExtractor";
-//var result = libNLicense.NLicenseObtainA("/local", "5000", components, pAvailable);
-if(result < 0) {
+if(result == -14) {
+    console.log('Could not contact license server: ' + result);
+} else if(result < 0) {
     console.log('License activation failed: ' + result);
     return;
 }
@@ -85,7 +84,10 @@ app.post('/', function(req, res) {
     var faces = ref.alloc('pointer');
     result = libNBiometrics.NleDetectFaces(pExtractor.deref(), pGrayscale.deref(), faceCount, faces);
     debugger;
-    if(result < 0)
+    if(result == -200)
+    {
+        res.status(500).send("Error: problems acquiring license: " + result);
+    } else if(result < 0)
     {
         res.status(500).send("Face detection failed with error " + result);
     }
