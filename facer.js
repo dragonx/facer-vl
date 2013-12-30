@@ -15,11 +15,10 @@ var libNMedia = ffi.Library('lib/libNMedia', {
     'NImageCreateFromFileExA': [ 'int', [ 'string', 'pointer', 'long', 'pointer', 'pointer' ] ],
     'NImageToGrayscale' : [ 'int', [ 'pointer', 'pointer' ] ]
 });
-
 var libNBiometrics = ffi.Library('lib/libNBiometrics', {
     'NObjectSetParameterWithPartEx' : [ 'int', [ 'pointer', 'short', 'int', 'int', 'pointer', 'long' ] ],
     'NleCreate' : [ 'int', [ 'pointer' ] ],
-    'NleDetectFaces' : [ 'int', [ 'pointer', 'pointer', ref.refType('int'), 'pointer' ] ]
+    'NleDetectFaces' : [ 'int', [ 'pointer', 'pointer', ref.refType('int'), ref.refType(face_type)] ]
 });
 
 var rect_type = struct({
@@ -114,10 +113,17 @@ app.post('/', function(req, res) {
     }
 
     var faces = [];
+    var count = faceCount.deref();
 
-    if(faceCount.deref() > 0)
+    if(count > 0)
     {
-        faces.push(ppface.deref().deref());
+        var face_array = ppface.readPointer(0, count * face_type.size);
+        var i = 0;
+        for(i = 0; i < count; i++)
+        {
+            var face = ref.get(face_array, i * face_type.size, face_type)
+            faces.push(face);
+        }
     }
 
     res.send(JSON.stringify({count: faceCount.deref(), faces: faces}));
