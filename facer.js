@@ -22,12 +22,31 @@ var libNBiometrics = ffi.Library('lib/libNBiometrics', {
     'NleDetectFaces' : [ 'int', [ 'pointer', 'pointer', ref.refType('int'), 'pointer' ] ]
 });
 
+var rect_type = struct({
+    'x': 'int',
+    'y': 'int',
+    'width': 'int',
+    'height': 'int',
+});
+var rotation_type = struct({
+    'yaw': 'short',
+    'pitch': 'short',
+    'roll': 'short'
+});
+var face_type = struct({
+    'rect' : rect_type,
+    'rotation' : rotation_type,
+    'confidence' : 'double'
+});
+
 var pAvailable = ref.alloc('bool');
 var components = "Biometrics.FaceDetection,Biometrics.FaceExtraction";
-var result = libNLicense.NLicenseObtainComponentsA("99.225.93.59", "5000", components, pAvailable);
+//var result = libNLicense.NLicenseObtainComponentsA("99.225.93.59", "5000", components, pAvailable);
+var result = libNLicense.NLicenseObtainComponentsA("/local", "5000", components, pAvailable);
 
 if(result == -14) {
     console.log('Could not contact license server: ' + result);
+    return;
 } else if(result < 0) {
     console.log('License activation failed: ' + result);
     return;
@@ -35,7 +54,7 @@ if(result == -14) {
 if(!pAvailable.deref())
 {
     console.log('Licenses for ' + components + ' not available');
-
+    return;
     //while(result >= 0)
     //{
     //    console.log("Releasing components");
@@ -81,8 +100,10 @@ app.post('/', function(req, res) {
     }
 
     var faceCount = ref.alloc('int');
-    var faces = ref.alloc('pointer');
-    result = libNBiometrics.NleDetectFaces(pExtractor.deref(), pGrayscale.deref(), faceCount, faces);
+    var pface_type = ref.refType(face_type);
+    var ppface = ref.alloc(pface_type);
+
+    result = libNBiometrics.NleDetectFaces(pExtractor.deref(), pGrayscale.deref(), faceCount, ppface);
     debugger;
     if(result == -200)
     {
@@ -92,7 +113,14 @@ app.post('/', function(req, res) {
         res.status(500).send("Face detection failed with error " + result);
     }
 
-    res.send("Found " + faces.deref() + " faces.");
+    var faces = [];
+
+    if(faceCount.deref() > 0)
+    {
+        faces.push(ppface.deref().deref());
+    }
+
+    res.send(JSON.stringify({count: faceCount.deref(), faces: faces}));
 });
 
 var port = process.env.PORT || 5001;
