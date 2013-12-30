@@ -83,6 +83,7 @@ app.post('/', function(req, res) {
     var ppface = ref.alloc(pface_type, null);
 
     try {
+        var start = process.hrtime();
         var result = libNMedia.NImageCreateFromFileExA(req.files.image.path, null, 0, null, pImage);
         if(result < 0)
         {
@@ -104,6 +105,7 @@ app.post('/', function(req, res) {
         var faceCount = ref.alloc('int');
 
         result = libNBiometrics.NleDetectFaces(pExtractor.deref(), pGrayscale.deref(), faceCount, ppface);
+        var end = process.hrtime(start);
         if(result == -200)
         {
             res.status(500).send("Error: problems acquiring license: " + result);
@@ -125,7 +127,7 @@ app.post('/', function(req, res) {
                 faces.push(face.rect);
             }
         }
-        res.send(JSON.stringify({count: faceCount.deref(), faces: faces}));
+        res.send(JSON.stringify({count: faceCount.deref(), time: end, faces: faces}));
     } finally {
         // Release stuff
         if(!pImage.deref().isNull())
