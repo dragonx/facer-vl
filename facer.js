@@ -45,8 +45,8 @@ var libNBiometrics = ffi.Library('lib/libNBiometrics', {
 // Get License or die trying.
 var pAvailable = ref.alloc('bool');
 var components = "Biometrics.FaceDetection,Biometrics.FaceExtraction";
-//var result = libNLicense.NLicenseObtainComponentsA("99.225.93.59", "5000", components, pAvailable);
-var result = libNLicense.NLicenseObtainComponentsA("/local", "5000", components, pAvailable);
+var result = libNLicense.NLicenseObtainComponentsA("99.225.93.59", "5000", components, pAvailable);
+//var result = libNLicense.NLicenseObtainComponentsA("/local", "5000", components, pAvailable);
 
 if(result == -14) {
     console.log('Could not contact license server: ' + result);
@@ -70,7 +70,7 @@ app.use(logfmt.requestLogger());
 app.use(express.bodyParser());
 
 app.get('/', function(req, res) {
-    res.send('<html><body><h1>Facer</h1><form method="post" enctype="multipart/form-data"><input type="file" name="image" id="id_image"><br/><br/><input type="submit" value="submit"></body></html>');
+    res.send('<html><body><h1>Facer-VL</h1><form method="post" enctype="multipart/form-data"><input type="file" name="image" id="id_image"><br/><br/><input type="submit" value="submit"></body></html>');
 });
 
 app.get('/image', function(req, res) {
