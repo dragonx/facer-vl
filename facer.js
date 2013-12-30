@@ -122,7 +122,7 @@ app.post('/', function(req, res) {
             for(i = 0; i < count; i++)
             {
                 var face = ref.get(face_array, i * face_type.size, face_type)
-                faces.push(face);
+                faces.push(face.rect);
             }
         }
         res.send(JSON.stringify({count: faceCount.deref(), faces: faces}));
