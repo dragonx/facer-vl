@@ -105,7 +105,7 @@ app.post('/', function(req, res) {
         var faceCount = ref.alloc('int');
 
         result = libNBiometrics.NleDetectFaces(pExtractor.deref(), pGrayscale.deref(), faceCount, ppface);
-        var end = process.hrtime(start);
+        var diff = process.hrtime(start);
         if(result == -200)
         {
             res.status(500).send("Error: problems acquiring license: " + result);
@@ -127,7 +127,7 @@ app.post('/', function(req, res) {
                 faces.push(face.rect);
             }
         }
-        res.send(JSON.stringify({count: faceCount.deref(), time: end, faces: faces}));
+        res.send(JSON.stringify({count: faceCount.deref(), time: diff[0] * 1e9 + diff[1], faces: faces}));
     } finally {
         // Release stuff
         if(!pImage.deref().isNull())
